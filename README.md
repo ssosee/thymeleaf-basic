@@ -85,14 +85,14 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
- <meta charset="UTF-8">
- <title>Title</title>
+  <meta charset="UTF-8">
+  <title>Title</title>
 </head>
 <body>
 <h1>컨텐츠에 데이터 출력하기</h1>
 <ul>
- <li>th:text 사용 <span th:text="${data}"></span></li>
- <li>컨텐츠 안에서 직접 출력하기 = [[${data}]]</li>
+  <li>th:text 사용 <span th:text="${data}"></span></li>
+  <li>컨텐츠 안에서 직접 출력하기 = [[${data}]]</li>
 </ul>
 </body>
 </html>
@@ -309,4 +309,177 @@ HTML에서 제공하는 대표적인 엔티티
 ### 리터럴(Literals)
 
 리터럴이란 **소스 코드상에 고정된 값**을 말하는 용어
+
+다음 예시에서 `"hello"`는 문자 리터럴,  `10`은 숫자 리터럴 이다.
+
+```java
+String str = "hello";
+int num = 10;
+```
+
+
+
+**타임리프는 다음과 같은 리터럴**이 있다.
+
+* 문자: `'hello'`
+* 숫자: 10
+* 불린: `true`, `false`
+* null: `null`
+
+
+
+타임리프에서 문자 리터럴은 **항상 `'`(작은 따옴표)로 감싸야한다.**😯
+
+```
+<span th:text="'hello'"></span>
+```
+
+
+
+하지만, 이것은 너무나도 귀찮은 일이다.. ㅠ0ㅠ
+
+그래서 타임리프는 공백 없이 쭉 이어진다면 하나의 의미있는 토큰으로 인지해서 **작은 따옴표를 생략** 할 수 있다.
+
+e.g) `A-Z`, `a-z`, `0-9`, `[]`, `.`, `-`, `_`
+
+
+
+리터럴 대체(Literal substitutions)
+
+리터럴 대체 문법을 사용하여 작은 따옴표를 생략 할 수도 있다.
+
+e.g) `<span th:text="|hello ${data}|"></span>`
+
+
+
+```html
+<!-- 정상 동작 -->
+<span th:text="'hello world'"></span>
+
+<!-- 오류 -->
+<span th:text="hello world"></span>
+
+<!-- 리터럴 대체 -->
+<span th:text="|hello world|"></span>
+```
+
+
+
+
+
+### 연산
+
+HTML에서 연산을 알아보자~
+
+* **비교연산**
+  * `>`(gt), `<`(lt), `>=`(ge), `<=`(le), `!`(not), `==`(eq), `!=`(neq, ne)
+* **조건식**
+  * 자바의 조건식과 유사
+  * `th:text="(10 % 2 == 0)? '짝수':'홀수'"`
+* **Elvis 연산자**
+  * 조건식의 편의 버전
+  * `th:text="${data}? : '데이터가 없습니다.'"`
+* **No-Operation**
+  * `_`인 경우 마치 타임리프가 실행되지 않는 것처럼 동작
+
+
+
+```html
+<ul>
+    <li>
+        산술 연산
+        <ul>
+            <li>10 + 2 = <span th:text="10 + 2"></span></li>
+            <li>10 % 2 == 0 = <span th:text="10 % 2 == 0"></span></li>
+        </ul>
+    </li>
+    <li>
+        비교 연산
+        <ul>
+            <li>1 > 10 = <span th:text="1 &gt; 10"></span></li>
+            <li>1 gt 10 = <span th:text="1 gt 10"></span></li>
+            <li>1 >= 10 = <span th:text="1 >= 10"></span></li>
+            <li>1 ge 10 = <span th:text="1 ge 10"></span></li>
+            <li>1 == 10 = <span th:text="1 == 10"></span></li>
+            <li>1 != 10 = <span th:text="1 != 10"></span></li>
+        </ul>
+    </li>
+    <li>
+        조건식
+        <ul>
+            <li>(10 % 2 == 0) ? '짝수' : '홀수' = <span th:text="(10 % 2 == 0)? '짝수':'홀수'"></span> </li>
+        </ul>
+    </li>
+    <li>
+        Elvis 연산자
+        <ul>
+            <li>${data}?:'데이터가 없습니다.' = <span th:text="${data}?:'데이터가 없습니다.'"></span> </li>
+            <li>${nullData}?:'데이터가 없습니다.' = <span th:text="${nullData}?:'데이터가 없습니다.'"></span> </li>
+        </ul>
+    </li>
+    <li>
+        No-Operation
+        <ul>
+            <li>${data}?:_ = <span th:text="${data}?:_"></span> </li>
+            <li>${nullData}?:_ = <span th:text="${nullData}?:_"></span> </li>
+        </ul>
+    </li>
+</ul>
+```
+
+
+
+
+
+### 속성 값 설정(Attribute)
+
+타임리프는 주로 HTML 태그에 `th:*` 속성을 지정하는 방식으로 동작
+
+`th:*`로 속성을 적용하면 기존 속성을 대체
+
+
+
+**속성 설정**
+
+* `th:* `속성을 지정하면 타임리프는 기존 속성을`th:*` 로 지정한 속성으로 대체한다.
+
+* 기존 속성이 없다면 새로 만든다.
+
+* 타임리프 렌더링 전`<input type="text" name="mock" th:name="userA" />`
+* 타임리프 렌더링 후 `<input type="text" name="userA" />`
+
+
+
+**속성 추가**
+
+* `th:attrappend` : 속성 값의 **뒤**에 값을 추가한다.
+* `th:attrprepend `: 속성 값의 **앞**에 값을 추가한다.
+* `th:classappend` : **class 속성에** 자연스럽게 추가한다.
+
+
+
+**checked 처리**
+
+* HTML에서는  `<input type="checkbox" name="active" checked="false" />`이 경우에도 checked 속성이 있기 때문에 checked 처리가 되어버린다.
+* HTML에서 `checked` 속성은 **`checked` 속성의 값과 상관없이 `checked` 라는 속성만 있어도 체크**가 된다.
+* 이런 부분이 true , false 값을 주로 사용하는 개발자 입장에서는 불편하다.
+* 타임리프의` th:checked` 는 값이**` false` 인 경우 `checked `속성 자체를 제거**한다.
+* 타임리프 렌더링 전: `<input type="checkbox" name="active" th:checked="false" />`
+* 타임리프 렌더링 후: `<input type="checkbox" name="active" />`
+
+
+
+```html
+<h1>속성 설정</h1>
+<input type="text" name="mock" th:name="userA" />
+<h1>속성 추가</h1>
+    - th:attrappend = <input type="text" class="text" th:attrappend="class='large'" /><br/>
+    - th:attrprepend = <input type="text" class="text" th:attrprepend="class='large'" /><br/>
+    - th:classappend = <input type="text" class="text" th:classappend="large" /><br/>
+<h1>checked 처리</h1>
+    - checked o <input type="checkbox" name="active" th:checked="true" /><br/>
+    - checked x <input type="checkbox" name="active" th:checked="false" /><br/>
+    - checked=false <input type="checkbox" name="active" checked="false" /><br/>
+</body>
+```
 
